@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Curvenote Preview</title>
+    <style>
+      #loading-screen {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;      
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+          'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        z-index: 9999;
+      }
+
+      .spinner-container {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .spinner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 74px;
+        height: 74px;
+        border: 4px solid #e5e7eb;
+        border-top-color: #1f2937;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        transform-origin: center center;
+      }
+
+      .spinner-logo {
+        position: relative;
+        width: 32px;
+        height: 32px;
+        z-index: 1;
+      }
+
+      .spinner-logo svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        margin-top: 20px;
+        color: #4b5563;
+        font-size: 14px;
+      }
+
+      /* Hide loading screen once React takes over */
+      .loaded #loading-screen {
+        display: none;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-DRj-Per4.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BRcAjvbj.css">
+  
+    <script>window.__BASE_PATH__ = "";</script>
+    <script>window.thebeLite = { version: 'monkey-patch-not-loaded' };</script>
+    <script src="/thebe-core.min.js" onload="window.setupThebeCore?.()"></script>
+    <link rel="stylesheet" href="/thebe-core.css">
+  </head>
+  <body>
+    <div id="loading-screen">
+      <div class="spinner-container">
+        <div class="spinner"></div>
+        <div class="spinner-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+            <g id="icon">
+              <path d="M389.8,304.2c0,47.2-38.2,85.5-85.5,85.6c-47.2,0-85.5-38.2-85.6-85.5c0-47.2,38.2-85.5,85.5-85.6c0,0,0,0,0,0C351.5,218.7,389.8,257,389.8,304.2z" fill="#000000"/>
+              <path d="M10.2,218.8h171v171C86.7,389.8,10.2,313.2,10.2,218.8z" fill="#000000"/>
+              <path d="M60.3,60.3c32-32.1,75.6-50.2,120.9-50.1v171.1h-171C10.1,135.8,28.1,92.3,60.3,60.3z" fill="#000000"/>
+              <path d="M339.7,131.1c-32,32.1-75.6,50.2-120.9,50.1V10.2h171C389.9,55.5,371.8,99,339.7,131.1z" fill="#000000"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="loading-text">Curvenote Preview</div>
+    </div>
+
+    <div id="root"></div>
+  </body>
+</html>
+
