@@ -90,8 +90,23 @@ function createServer() {
     logger: proxyLogger
   });
   app.use(`${basePath}/_socket`, wsProxy);
+  const processedRequests = /* @__PURE__ */ new Set();
   const spaRouteHandler = async (req, res, next) => {
+    if (res.headersSent) {
+      return;
+    }
+    const requestId = `${req.method}:${req.url}`;
+    if (processedRequests.has(requestId)) {
+      console.log("Skipping duplicate request:", requestId);
+      return;
+    }
+    processedRequests.add(requestId);
+    if (processedRequests.size > 100) {
+      const entries = Array.from(processedRequests);
+      entries.slice(0, entries.length - 100).forEach((id) => processedRequests.delete(id));
+    }
     if (req.path.startsWith("/assets/")) {
+      processedRequests.delete(requestId);
       return next();
     }
     console.log("Serving index.html for route:", req.url.replace(/^https?:\/\/[^/]+/, ""));
@@ -104,22 +119,35 @@ function createServer() {
         const indexPath = path.resolve(__dirname$1, "../../index.html");
         html = fs.readFileSync(indexPath, "utf-8");
       }
+      const hasExistingInjection = html.includes("window.__BASE_PATH__");
+      if (hasExistingInjection) {
+        html = html.replace(
+          /<script>window\.__BASE_PATH__[^<]*<\/script>\s*<script>window\.thebeLite[^<]*<\/script>\s*<script[^>]*thebe-core\.min\.js[^<]*<\/script>\s*<link[^>]*thebe-core\.css[^>]*>\s*/g,
+          ""
+        );
+      }
       const headInjection = `
     <script>window.__BASE_PATH__ = "${basePath}";<\/script>
-    <script>window.thebeLite = { version: 'monkey-patch-not-loaded' };<\/script>
+    <script>window.thebeLite = { version: 'not-loaded' };<\/script>
     <script src="${basePath}/thebe-core.min.js" onload="window.setupThebeCore?.()"><\/script>
     <link rel="stylesheet" href="${basePath}/thebe-core.css">
   </head>`;
       html = html.replace("</head>", headInjection);
-      html = html.replace(/src="\/assets\//g, `src="${basePath}/assets/`);
-      html = html.replace(/href="\/assets\//g, `href="${basePath}/assets/`);
-      html = html.replace(/href="\/app\//g, `href="${basePath}/app/`);
+      if (basePath) {
+        html = html.replace(/src="\/assets\//g, `src="${basePath}/assets/`);
+        html = html.replace(/href="\/assets\//g, `href="${basePath}/assets/`);
+        html = html.replace(/href="\/app\//g, `href="${basePath}/app/`);
+      }
       res.send(html).end();
     } catch (error) {
+      processedRequests.delete(requestId);
       next(error);
     }
   };
   function thebeAssetsHandler(req, res, next) {
+    if (res.headersSent) {
+      return;
+    }
     const thebeAssetsPath = path.resolve(__dirname$1, "./public");
     let assetPath = req.path;
     if (basePath && assetPath.startsWith(basePath)) {
@@ -128,24 +156,32 @@ function createServer() {
     const thebeAssets = fs.readFileSync(path.join(thebeAssetsPath, assetPath), "utf-8");
     res.send(thebeAssets).end();
   }
-  app.get(`${basePath}`, (req, res, next) => {
-    spaRouteHandler(req, res, next);
-  });
-  app.get(`${basePath}/*`, (req, res, next) => {
-    if (req.path.endsWith("thebe-core.min.js") || req.path.endsWith("thebe-lite.min.js") || req.path.endsWith("/service-worker.js") || req.path.endsWith("/thebe-core.css")) {
-      return thebeAssetsHandler(req, res);
+  const thebeAssetPaths = [
+    "/thebe-core.min.js",
+    "/thebe-lite.min.js",
+    "/service-worker.js",
+    "/thebe-core.css"
+  ];
+  thebeAssetPaths.forEach((assetPath) => {
+    if (basePath) {
+      app.get(`${basePath}${assetPath}`, thebeAssetsHandler);
     }
-    spaRouteHandler(req, res, next);
+    app.get(assetPath, thebeAssetsHandler);
   });
-  app.get("*", (req, res, next) => {
-    if (req.path.endsWith("thebe-core.min.js") || req.path.endsWith("thebe-lite.min.js") || req.path.endsWith("/service-worker.js") || req.path.endsWith("/thebe-core.css")) {
-      return thebeAssetsHandler(req, res);
-    }
-    if (basePath && !req.path.startsWith(basePath)) {
-      return res.redirect(basePath);
-    }
-    next();
-  });
+  if (basePath) {
+    app.get(`${basePath}`, spaRouteHandler);
+    app.get(`${basePath}/*`, spaRouteHandler);
+  } else {
+    app.get("*", (req, res, next) => {
+      if (res.headersSent) {
+        return;
+      }
+      if (req.path.endsWith("thebe-core.min.js") || req.path.endsWith("thebe-lite.min.js") || req.path.endsWith("/service-worker.js") || req.path.endsWith("/thebe-core.css")) {
+        return next();
+      }
+      return spaRouteHandler(req, res, next);
+    });
+  }
   const server = http.createServer(app);
   serverInstance = server;
   server.on("upgrade", (req, socket, head) => {
@@ -153,7 +189,9 @@ function createServer() {
       console.log("✅ Proxying WebSocket to content CDN...");
       wsProxy.upgrade?.(req, socket, head);
     } else {
-      console.log("❌ WebSocket URL did not match, destroying socket");
+      console.log(
+        "❌ WebSocket URL did not match, destroying socket (if this message persists, you may have an old tab open)"
+      );
       socket.destroy();
     }
   });
