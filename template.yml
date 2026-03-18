@@ -12,7 +12,15 @@ authors:
 tags:
   - preview
   - development
-options: []
+options:
+  - type: string
+    id: base_path
+    description: >-
+      URL path prefix for the theme (e.g. /proxy/3000). Injected as window.__BASE_PATH__
+      so assets and API calls work behind a proxy. Leave empty when not behind a prefix.
+  - type: string
+    id: site_id
+    description: Site identifier for this deployment (e.g. for analytics or feature flags).
 build:
   install: npm ci --ignore-scripts
   start: npm run start

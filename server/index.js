@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const version = "0.1.2";
 const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === "production";
-const port = process.env.PORT || 3e3;
+const port = process.env.PORT || 3050;
 const contentCdnPort = process.env.CONTENT_CDN_PORT || 3100;
 const contentCdnHost = process.env.CONTENT_CDN_HOST || "localhost";
 const contentCdnUrl = `${contentCdnHost}:${contentCdnPort}`;
@@ -67,6 +67,19 @@ function createServer() {
       version
     });
   });
+  const scmsTarget = (process.env.CURVENOTE_SCMS_BASE_URL || "https://scms.curvenote.com").replace(/\/$/, "") + "/v1";
+  app.use(
+    `${basePath}/_scms`,
+    createProxyMiddleware({
+      target: scmsTarget.startsWith("http") ? scmsTarget : `https://${scmsTarget}`,
+      changeOrigin: true,
+      pathRewrite: {
+        // Strip basePath and /_scms so e.g. /proxy/3000/_scms/sites/xxx -> /sites/xxx (target is .../v1)
+        [`^${basePath}/_scms`]: ""
+      },
+      logger: proxyLogger
+    })
+  );
   app.use(
     `${basePath}/_build`,
     createProxyMiddleware({
@@ -90,23 +103,11 @@ function createServer() {
     logger: proxyLogger
   });
   app.use(`${basePath}/_socket`, wsProxy);
-  const processedRequests = /* @__PURE__ */ new Set();
   const spaRouteHandler = async (req, res, next) => {
     if (res.headersSent) {
       return;
     }
-    const requestId = `${req.method}:${req.url}`;
-    if (processedRequests.has(requestId)) {
-      console.log("Skipping duplicate request:", requestId);
-      return;
-    }
-    processedRequests.add(requestId);
-    if (processedRequests.size > 100) {
-      const entries = Array.from(processedRequests);
-      entries.slice(0, entries.length - 100).forEach((id) => processedRequests.delete(id));
-    }
     if (req.path.startsWith("/assets/")) {
-      processedRequests.delete(requestId);
       return next();
     }
     console.log("Serving index.html for route:", req.url.replace(/^https?:\/\/[^/]+/, ""));
@@ -140,7 +141,6 @@ function createServer() {
       }
       res.send(html).end();
     } catch (error) {
-      processedRequests.delete(requestId);
       next(error);
     }
   };
@@ -198,8 +198,11 @@ function createServer() {
   server.listen(port, () => {
     const baseUrl = `localhost:${port}${basePath}`;
     console.log("Curvenote Preview Server is running...");
-    console.log(`Server running at ${baseUrl}`);
-    console.log(`  - Build API: ${baseUrl}/_build/:slug`);
+    console.log(`  API/proxy server: http://${baseUrl}`);
+    if (!isProduction) {
+      console.log(`  → Use http://localhost:3000 for the app (Vite dev server proxies here)`);
+    }
+    console.log(`  - Build API: http://${baseUrl}/_build/:slug`);
     console.log(`  - WebSocket: ws://localhost:${port}${basePath}/_socket`);
   });
 }

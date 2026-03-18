@@ -1,17 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Curvenote Preview</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M389.8,304.2c0,47.2-38.2,85.5-85.5,85.6c-47.2,0-85.5-38.2-85.6-85.5c0-47.2,38.2-85.5,85.5-85.6c0,0,0,0,0,0C351.5,218.7,389.8,257,389.8,304.2z' fill='%23000000'/%3E%3Cpath d='M10.2,218.8h171v171C86.7,389.8,10.2,313.2,10.2,218.8z' fill='%23000000'/%3E%3Cpath d='M60.3,60.3c32-32.1,75.6-50.2,120.9-50.1v171.1h-171C10.1,135.8,28.1,92.3,60.3,60.3z' fill='%23000000'/%3E%3Cpath d='M339.7,131.1c-32,32.1-75.6,50.2-120.9,50.1V10.2h171C389.9,55.5,371.8,99,339.7,131.1z' fill='%23000000'/%3E%3C/svg%3E" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M389.8,304.2c0,47.2-38.2,85.5-85.5,85.6c-47.2,0-85.5-38.2-85.6-85.5c0-47.2,38.2-85.5,85.5-85.6c0,0,0,0,0,0C351.5,218.7,389.8,257,389.8,304.2z' fill='%23000000'/%3E%3Cpath d='M10.2,218.8h171v171C86.7,389.8,10.2,313.2,10.2,218.8z' fill='%23000000'/%3E%3Cpath d='M60.3,60.3c32-32.1,75.6-50.2,120.9-50.1v171.1h-171C10.1,135.8,28.1,92.3,60.3,60.3z' fill='%23000000'/%3E%3Cpath d='M339.7,131.1c-32,32.1-75.6,50.2-120.9,50.1V10.2h171C389.9,55.5,371.8,99,339.7,131.1z' fill='%23000000'/%3E%3C/svg%3E"
+    />
     <style>
       #loading-screen {
         margin: 0;
         padding: 0;
-        box-sizing: border-box;      
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-          'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        box-sizing: border-box;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+          'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         position: fixed;
@@ -25,12 +30,22 @@
         justify-content: center;
         background: white;
         z-index: 9999;
+        transition: opacity 0.3s ease-out;
       }
 
+      /* Fade out loading screen when React is ready, then .loaded hides it */
+      body.loading-screen-exiting #loading-screen {
+        opacity: 0;
+      }
+
+      /* Match welcome screen: 40px container, 37px ring (border-box), 16px logo, top-left */
       .spinner-container {
-        position: relative;
-        width: 80px;
-        height: 80px;
+        position: absolute;
+        top: 1.5rem;
+        left: 1.5rem;
+        box-sizing: border-box;
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -38,11 +53,12 @@
 
       .spinner {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 74px;
-        height: 74px;
-        border: 4px solid #e5e7eb;
+        top: 1.5px;
+        left: 1.5px;
+        box-sizing: border-box;
+        width: 37px;
+        height: 37px;
+        border: 2px solid #e5e7eb;
         border-top-color: #1f2937;
         border-radius: 50%;
         animation: spin 1s linear infinite;
@@ -51,14 +67,19 @@
 
       .spinner-logo {
         position: relative;
-        width: 32px;
-        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
         z-index: 1;
       }
 
       .spinner-logo svg {
+        display: block;
         width: 100%;
         height: 100%;
+        vertical-align: middle;
       }
 
       @keyframes spin {
@@ -78,8 +99,8 @@
         display: none;
       }
     </style>
-    <script type="module" crossorigin src="/assets/index-BpJXTtAJ.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-p1ihFugn.css">
+    <script type="module" crossorigin src="/assets/index-D3H_I1rz.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BB8H-G1G.css">
   
     <script>window.__BASE_PATH__ = "";</script>
     <script>window.thebeLite = { version: 'monkey-patch-not-loaded' };</script>
@@ -93,18 +114,25 @@
         <div class="spinner-logo">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
             <g id="icon">
-              <path d="M389.8,304.2c0,47.2-38.2,85.5-85.5,85.6c-47.2,0-85.5-38.2-85.6-85.5c0-47.2,38.2-85.5,85.5-85.6c0,0,0,0,0,0C351.5,218.7,389.8,257,389.8,304.2z" fill="#000000"/>
-              <path d="M10.2,218.8h171v171C86.7,389.8,10.2,313.2,10.2,218.8z" fill="#000000"/>
-              <path d="M60.3,60.3c32-32.1,75.6-50.2,120.9-50.1v171.1h-171C10.1,135.8,28.1,92.3,60.3,60.3z" fill="#000000"/>
-              <path d="M339.7,131.1c-32,32.1-75.6,50.2-120.9,50.1V10.2h171C389.9,55.5,371.8,99,339.7,131.1z" fill="#000000"/>
+              <path
+                d="M389.8,304.2c0,47.2-38.2,85.5-85.5,85.6c-47.2,0-85.5-38.2-85.6-85.5c0-47.2,38.2-85.5,85.5-85.6c0,0,0,0,0,0C351.5,218.7,389.8,257,389.8,304.2z"
+                fill="#000000"
+              />
+              <path d="M10.2,218.8h171v171C86.7,389.8,10.2,313.2,10.2,218.8z" fill="#000000" />
+              <path
+                d="M60.3,60.3c32-32.1,75.6-50.2,120.9-50.1v171.1h-171C10.1,135.8,28.1,92.3,60.3,60.3z"
+                fill="#000000"
+              />
+              <path
+                d="M339.7,131.1c-32,32.1-75.6,50.2-120.9,50.1V10.2h171C389.9,55.5,371.8,99,339.7,131.1z"
+                fill="#000000"
+              />
             </g>
           </svg>
         </div>
       </div>
-      <div class="loading-text">Curvenote Preview</div>
     </div>
 
     <div id="root"></div>
   </body>
 </html>
-
