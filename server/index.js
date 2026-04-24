@@ -4,7 +4,7 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-const version = "0.1.2";
+const version = "0.1.3";
 const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === "production";
 const port = process.env.PORT || 3050;
