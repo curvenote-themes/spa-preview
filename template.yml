@@ -1,7 +1,7 @@
 jtex: v1
 title: Curvenote SPA Preview Theme
 description: A proxy friendly theme server for local previews of Curvenote articles based on a React SPA
-version: 0.2.0
+version: 0.2.1
 license: Restricted. See LICENSE for details.
 source: https://github.com/curvenote/next-theme
 authors:
