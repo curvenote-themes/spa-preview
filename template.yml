@@ -1,7 +1,7 @@
 jtex: v1
 title: Curvenote SPA Preview Theme
 description: A proxy friendly theme server for local previews of Curvenote articles based on a React SPA
-version: 0.2.2
+version: 0.2.3
 license: Restricted. See LICENSE for details.
 source: https://github.com/curvenote/next-theme
 authors:
@@ -22,12 +22,12 @@ options:
     id: site_id
     description: Site identifier for this deployment (e.g. for analytics or feature flags).
 build:
-  install: bun install --production
+  install: npm install --omit=dev
   start: NODE_ENV=production node server/index.js
 files:
   - client/**/*
   - server/**/*
   - package.json
-  - bun.lock
+  - package-lock.json
   - LICENSE
   - README.md
